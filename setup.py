@@ -7,6 +7,7 @@ except ImportError:
 
 import os
 import sys
+import distutils
 from setuptools import Command
 from setuptools.command.build_py import build_py
 from setuptools.command.sdist import sdist
@@ -36,6 +37,7 @@ class SdistCommand(sdist):
         if os.path.isfile(COMPILED_CONTRACTS) is False:
             try:
                 self.run_command('build')
+                pass
             except SystemExit:
                 pass
         super().run()
@@ -63,7 +65,14 @@ class CompileContracts(Command):
         old_argv = sys.argv
         sys.argv = ['populus', 'compile']
 
-        import populus.utils.compile
+        try:
+            import populus.utils.compile
+        except ImportError:
+            self.announce(
+                'Populus not found. Skipping contract compilation',
+                level=distutils.log.WARN
+            )
+            return
         populus.utils.compile.BUILD_ASSET_DIR = os.path.dirname(COMPILED_CONTRACTS)
         from populus.cli import main
         main()
@@ -82,6 +91,7 @@ config = {
     'keywords': 'raiden ethereum blockchain',
     'install_requires': read_requirements('requirements.txt'),
     'packages': find_packages(exclude=['*.tests*']),
+    'include_package_data': False,
     'classifiers': [
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

@@ -140,4 +140,7 @@ class ContractManager:
         return get_event_from_abi(contract_abi, event_name)
 
 
-CONTRACT_MANAGER = ContractManager(CONTRACTS_DIR)
+if os.path.isfile(CONTRACTS_DIR):
+    CONTRACT_MANAGER = ContractManager(CONTRACTS_DIR)
+else:
+    CONTRACT_MANAGER = ContractManager(CONTRACTS_SOURCE_DIRS)
